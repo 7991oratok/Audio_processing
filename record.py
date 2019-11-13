@@ -1,67 +1,88 @@
-
 # -*- coding: utf-8 -*-
-# ライブラリの読込
 import pyaudio
+import sys
+import time
 import wave
+import requests
+import os
+import json
 import numpy as np
 from datetime import datetime
+import subprocess
 
-# 音データフォーマット
-chunk = 1024
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 44100
-RECORD_SECONDS = 4
-STOP_SECONDS = 2  # [sec]
-B = int(RATE / chunk * STOP_SECONDS)
-# 閾値
-threshold = 0.005
+def recognize_rec():
 
-# 音の取込開始
-p = pyaudio.PyAudio()
-stream = p.open(format = FORMAT,
-    channels = CHANNELS,
-    rate = RATE,
-    input = True,
-    frames_per_buffer = chunk
-)
+    chunk = 1024
+    threshold = 0.002
 
-cnt = 0
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 1
+    RATE = 16000
+    STOP_SECONDS = 1  # レコード後の無音区間の継続時間
+    RECORD_SECONDS = 10 # レコード時間の最大値
 
-while True:
-    # 音データの取得
-    data = stream.read(chunk)
-    # ndarrayに変換
-    x = np.frombuffer(data, dtype="int16") / 32768.0
+    A = int(RATE) / int(chunk) * int(RECORD_SECONDS)
+    B = int(RATE / chunk * STOP_SECONDS)
+    p = pyaudio.PyAudio()
 
-    # 閾値以上の場合はファイルに保存
-    if x.max() > threshold:
-        filename = datetime.today().strftime("%Y%m%d%H%M%S") + ".wav"
-        print(cnt, filename)
+    stream = p.open(format = FORMAT,
+                    channels = CHANNELS,
+                    rate = RATE,
+                    input = True,
+                    frames_per_buffer = chunk)
 
-        # 2秒間の音データを取込
-        all = []
-        all.append(data)
-        for i in range(0, int(RATE / chunk * int(RECORD_SECONDS))):
-            data = stream.read(chunk)
-            all.append(data)
-        data = b''.join(all)
+    
+    print("RATE = " + str(RATE))
+    print("chunk = " + str(chunk))
+    print("RECORD_SECONDS = " + str(RECORD_SECONDS))
+    print("RATE / chunk * RECORD_SECONDS = " + str(A))
+    print("")
 
-        # 音声ファイルとして出力
-        out = wave.open(filename,'w')
-        out.setnchannels(CHANNELS)
-        out.setsampwidth(2)
-        out.setframerate(RATE)
-        out.writeframes(data)
-        out.close()
+    cnt = 0
 
-        print("Saved.")
+    while True:
+        data = stream.read(chunk)
+        x = np.frombuffer(data, dtype="int16") / 32768.0
 
-        cnt += 1
+        #まずサンプルを取る！
+        xmax = x.max()
 
-    # 5回検出したら終了
-    if cnt > 5:
-        break
+        if xmax > threshold: #録音レベルがしきい値を上回ったら
+            filename = datetime.today().strftime("%Y%m%d%H%M%S") + ".wav"
+            print(cnt, filename)
+            all = []
+            n = 0
+            for i in range(0, int(A)): #←抜けたいfor構文！
+                data = stream.read(chunk)
+                all.append(data)
+                x = np.frombuffer(data, dtype="int16") / 32768.0
+                xmax = x.max()
 
-stream.close()
-p.terminate()
+                if xmax <= threshold:
+                    n += 1
+                else:
+                    n = 0
+                # 中断判定
+                if n == B:
+                    break
+
+            data = b''.join(all)
+            out = wave.open("result/" + filename,'w')
+            out.setnchannels(1) #mono
+            out.setsampwidth(2) #16bits
+            out.setframerate(RATE)
+            out.writeframes(data)
+            out.close()
+            cnt += 1
+
+            
+        if cnt > 5 : break      
+
+    stream.close() 
+    p.terminate()
+
+
+if __name__ == '__main__':
+    print(recognize_rec())
+    print("Recording finished.")
+    # subprocess.run('HCopy')
