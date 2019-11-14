@@ -93,13 +93,19 @@ def script_hcopy():
         wavefiles.append(f.name)
 
     fname = "result/script.hcopy"
+    fname2 = "input.sh"
+
     file = open(fname, 'w')
+    file2 = open(fname2 ,'w')
     
     for i in range(len(wavefiles)):
         tmp = wavefiles[i].replace('.wav', '')
         file.write('result/' + tmp + '.wav result/' + tmp + '.mfc\n')
+        file2.write('HList -r result/' + tmp + '.mfc > MFCC_DATA/' + tmp + '.txt\n')
+
 
     file.close()
+
     print("Writing done.")
 
 # HCopy 実行
@@ -107,8 +113,13 @@ def hcopy():
     subprocess.run('HCopy -C result/config.hcopy -S result/script.hcopy', shell=True)
     print("HCopy done.")
 
+def hlist():
+    subprocess.run('bash input.sh', shell=True)
+    print("HList done.")
+
 if __name__ == '__main__':
     
-    print(recognize_rec())
+    # print(recognize_rec())
     script_hcopy()
     hcopy()
+    hlist()
