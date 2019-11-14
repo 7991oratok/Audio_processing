@@ -53,7 +53,7 @@ def recognize_rec():
             print(cnt, filename)
             all = []
             n = 0
-            for i in range(0, int(A)): #←抜けたいfor構文！
+            for _ in range(0, int(A)): 
                 data = stream.read(chunk)
                 all.append(data)
                 x = np.frombuffer(data, dtype="int16") / 32768.0
