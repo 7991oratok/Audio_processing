@@ -9,12 +9,13 @@ import json
 import numpy as np
 from datetime import datetime
 import subprocess
+import pathlib
 
+# 音声録音
 def recognize_rec():
 
     chunk = 1024
     threshold = 0.002
-
     FORMAT = pyaudio.paInt16
     CHANNELS = 1
     RATE = 16000
@@ -75,14 +76,39 @@ def recognize_rec():
             out.close()
             cnt += 1
 
-            
-        if cnt > 5 : break      
+        if cnt > 5 : 
+            print("Recording done.")
+            break      
 
     stream.close() 
     p.terminate()
 
+# result内のwavファイル名を取得
+# scriptファイルに hoge.wav hoge.mfc ... を書き込み
+def script_hcopy():
+
+    wavefiles = []
+    all = pathlib.Path('result/').glob('*.wav')
+    for f in all:
+        wavefiles.append(f.name)
+
+    fname = "script.hcopy"
+    file = open(fname, 'w')
+    
+    for i in range(len(wavefiles)):
+        tmp = wavefiles[i].replace('.wav', '')
+        file.write('result/' + tmp + '.wav result/' + tmp + '.mfc\n')
+
+    file.close()
+    print("Writing done.")
+
+# HCopy 実行
+def hcopy():
+    subprocess.run('HCopy -C result/config.hcopy -S result/script.hcopy', shell=True)
+    print("HCopy done.")
 
 if __name__ == '__main__':
+    
     print(recognize_rec())
-    print("Recording finished.")
-    # subprocess.run('HCopy')
+    script_hcopy()
+    hcopy()
