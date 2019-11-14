@@ -92,7 +92,7 @@ def script_hcopy():
     for f in all:
         wavefiles.append(f.name)
 
-    fname = "script.hcopy"
+    fname = "result/script.hcopy"
     file = open(fname, 'w')
     
     for i in range(len(wavefiles)):
