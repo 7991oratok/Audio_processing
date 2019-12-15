@@ -4,11 +4,9 @@ import os
 
 initial = 'chigau_chigau'
 
-all = pathlib.Path('result/').glob('*.wav')
+all = pathlib.Path('2019_12_MFCC_DATA/').glob('*.txt')
 for i,f in enumerate(all):
-    path1 = 'result/' + f.name 
-    path2 = 'result/' + initial + str(i) + '.wav'
-    os.rename(path1, path2)
+    print(f.name.replace('.txt', ''))
     
 
 
