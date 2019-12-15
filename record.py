@@ -88,11 +88,11 @@ def recognize_rec():
 def script_hcopy():
 
     wavefiles = []
-    all = pathlib.Path('result/').glob('*.wav')
+    all = pathlib.Path('2019_12_result/').glob('*.wav')
     for f in all:
         wavefiles.append(f.name)
 
-    fname = "result/script.hcopy"
+    fname = "2019_12_result/script.hcopy"
     fname2 = "input.sh"
 
     file = open(fname, 'w')
@@ -100,8 +100,8 @@ def script_hcopy():
     
     for i in range(len(wavefiles)):
         tmp = wavefiles[i].replace('.wav', '')
-        file.write('result/' + tmp + '.wav result/' + tmp + '.mfc\n')
-        file2.write('HList -r result/' + tmp + '.mfc > MFCC_DATA/' + tmp + '.txt\n')
+        file.write('2019_12_result/' + tmp + '.wav 2019_12_result/' + tmp + '.mfc\n')
+        file2.write('HList -r 2019_12_result/' + tmp + '.mfc > 2019_12_MFCC_DATA/' + tmp + '.txt\n')
 
 
     file.close()
@@ -110,7 +110,7 @@ def script_hcopy():
 
 # HCopy 実行
 def hcopy():
-    subprocess.run('HCopy -C result/config.hcopy -S result/script.hcopy', shell=True)
+    subprocess.run('HCopy -C 2019_12_result/config.hcopy -S 2019_12_result/script.hcopy', shell=True)
     print("HCopy done.")
 
 def hlist():
@@ -120,6 +120,6 @@ def hlist():
 if __name__ == '__main__':
     
     # print(recognize_rec())
-    script_hcopy()
-    hcopy()
+    # script_hcopy()
+    # hcopy()
     hlist()

@@ -1,0 +1,14 @@
+ SOURCEFORMAT = WAVE
+ SOURCEKIND = WAVEFORM
+ TARGETKIND = MFCC # 出力する特徴量の形式（MFCC 39）
+ TARGETRATE = 100000.0   # フレームシフト長、10msec = 100000 x 100nsec
+ SAVECOMPRESSED = T      # 出力結果を圧縮ファイルで保存する
+ WINDOWSIZE = 250000.0   # フレームの幅、25msec
+ USEHAMMING = T          # ハミング窓を使う
+ PREEMCOEF = 0.97        # プリエンファシス係数
+ NUMCHANS = 24           # メルフィルタバンクのチャンネル数
+ NUMCEPS = 12            # メルフィルタバンクの低次成分 12 次元を取り出す
+ CEPLIFTER = 22          # ケプストラムのリフタリングの値
+ ENORMALISE = F          # 対数エネルギーで正規化をするかどうか
+ DELTAWINDOW = 2         # デルタケプストラムのウインドウの幅
+ ACCWINDOW = 2           # デルタデルタケプストラムのウインドウの幅
